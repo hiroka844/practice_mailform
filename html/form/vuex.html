@@ -1,0 +1,50 @@
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<title>練習用</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" >
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/vuex"></script>
+    <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.js"></script>
+</head>
+<body>
+
+    <div id="app" class="container mt-5">
+        <div class="row">
+            <div class="col-md-8">
+                <input type="text" @input="message">
+                {{ store.state.message }}
+            </div>
+        </div>
+    </div>
+
+<script>
+    const store = new Vuex.Store({
+        state:{
+            message: 'az'
+        },
+        mutations:{
+            update(state,value){
+                state.message = value;
+            }
+        },
+        getters
+    })
+
+    const app = new Vue({
+        el: '#app',
+        data:{
+            message: '初期値'
+        },
+        methods:{
+            message(e){
+                store.commit('update',e.target.value);
+            }            
+        },
+        store
+    });
+
+    console.log(store.state.message);
+</script>
+</body>
+</html>

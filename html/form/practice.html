@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<meta http-equiv="imagetoolbar" content="no">
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
+
+<title>送付先入力</title>
+<meta name="Keywords" content="">
+<meta name="description" content="">
+<meta name="Priority" value="0">
+<link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png">
+<link rel="icon" type="image/vnd.microsoft.icon" href="/favicon.ico" />
+<meta property="og:title" content="">
+<meta property="og:type" content="website">
+<meta property="og:url" content="">
+<meta property="og:site_name" content="">
+<meta property="og:description" content="">
+<meta property="og:image" content="">
+<meta name="twitter:card" content="photo">
+<meta name="twitter:image" content="">
+<!--共通css-->
+<link rel="stylesheet" href="../common/css/default.css" media="all">
+<link rel="stylesheet" href="../common/css/base_pc.css" media="all">
+<link rel="stylesheet" href="../common/css/base_sp.css" media="all">
+<!--共通js-->
+<script src="../common/js/jquery-1.8.3.min.js"></script>
+<script src="../common/js/common.js"></script>
+<!--ページ個別css-->
+<link rel="stylesheet" href="../common/css/jquery.mCustomScrollbar.css" media="all">
+<link rel="stylesheet" href="css/entry_pc.css" media="all">
+<link rel="stylesheet" href="css/entry_sp.css" media="all">
+<!--ページ個別js-->
+<script src="../common/js/jquery.mCustomScrollbar.js"></script>
+<script src="js/entry_form.js"></script>
+<script src="js/entry_form_input.js"></script>
+<!-- Vue.js -->
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios@0.18.0/dist/axios.min.js"></script>
+</head>
+<body>
+	<div id="contentsWrap">
+        <section id="mv">
+			<h1>
+				<img src="../common/img/img_mv.png" alt="dummy" class="pc">
+				<img src="../common/img/sp/img_mv.png" alt="dummy" class="sp">
+			</h1>
+		</section>
+		<section id="contentsBox" class="form input">
+            <div class="inner">
+                <div id="app">
+                    <keep-alive>
+                            <form-input v-if="step === 'input'" @update="updateForm" v-bind:errormsg="errormsg"></form-input>
+                            <form-confirm v-if="step === 'confirm'" v-bind:form="form"></form-confirm>
+                    </keep-alive>
+                    <p class="btn confirm">
+                        <button @click="confirmStep" v-show="inputshow">
+                            <span>確認画面へ</span>
+                        </button>
+                    </p>
+                     <p class="btn confirm">
+                            <button @click="backStep" v-show="backshow">
+                                <span>入力画面へ</span>
+                            </button>
+                    </p>
+                    <pre><code>{{ form }}</code></pre>
+                </div>
+            </div><!-- class="inner" -->
+        </section><!-- id="contentsBox" -->
+    </div><!-- contentsWrap -->
+
+<script>
+
+    //入力画面コンポーネント(step === input)
+    Vue.component('form-input',{
+        template: `<form>
+                        <h2 class="ttl2">
+                            送付先入力フォーム
+                        </h2>
+                        <p class="lead">当選賞品の送付先をご入力ください。 
+                            <span class="note">ご入力いただいた情報に誤りがございますと、賞品が届かない場合がございますのでご注意ください。</span>
+                        </p>
+                        <div class="formBox">
+                            <table>
+                                <tr>
+                                    <th>
+                                        <b>お名前</b>
+                                    </th>
+                                    <td>
+                                        <p>
+                                            <span>姓</span>
+                                            <input type="text" name="name-sei" class="size1" placeholder="ヤマダ" maxlength="12" v-model="nameSei" @input="input">
+                                        </p>
+                                        <p>
+                                            <span>名</span>
+                                            <input type="text" name="name-mei" class="size1" placeholder="タロウ" maxlength="12" v-model="nameMei" @input="input">
+                                        </p>
+                                        <span v-if="errormsg" class="errorTxt">
+                                            {{errormsg.nameSei}}
+                                        </span>                                           
+                                        <span v-if="errormsg" class="errorTxt">
+                                            {{errormsg.nameMei}}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                </tr>
+                            </table>
+                        </div>
+                    </form>`,
+        //form-nameコンポーネントでの変数宣言
+        data: function(){
+            return {
+                nameSei: '',
+                nameMei: '',
+            }
+        },
+        methods:{
+            input: function(){
+                //Vueのバリデート
+                // if(!this.nameSei){
+                //     this.errormsg.nameSei = '姓を入力してください'
+                // }else{
+                //     this.errormsg.nameSei = ''
+                // }
+
+                // if(!this.nameMei){
+                //     this.errormsg.nameMei = '名を入力してください'
+                // }else{
+                //     this.errormsg.nameMei = ''
+                // }
+
+                //$emit…第1引数には「イベント名」、第2引数には「イベントデータ」
+                this.$emit('update',{
+                    nameSei: this.nameSei,
+                    nameMei: this.nameMei
+                });
+            }
+        },
+        props:{
+            errormsg: Object
+        }
+    });
+
+    Vue.component('form-confirm',{
+        template:`<div class="formBox">
+                  <table>
+                    <tr>
+                        <th><b>お名前</b></th>
+                        <td>{{ form.nameSei }}{{ form.nameMei }}</td>
+                    </tr>
+                  </table>
+                </div>
+                  `,
+        props:{
+            form: Object
+        }
+    });
+
+    const app = new Vue({
+        el: '#app',
+        data:{
+            step: 'input',
+            form:{
+                nameSei: '',
+                nameMei: ''
+            },
+            errormsg:{
+                nameSei: '',
+                nameMei: ''
+            },
+            inputshow: true,
+            backshow: false
+        },
+        methods:{
+            updateForm:function(formData){
+                Object.assign(this.form,formData);
+            },
+            //親に送られたものをaxiosでphpファイルへ送信
+            confirmStep:function(){
+                let params = new URLSearchParams();
+                params.append('nameSei',this.form.nameSei);
+                params.append('nameMei',this.form.nameSei);
+                axios.post('axios.php',params)
+                .then(response =>{
+                    if(response.data){
+                        //エラーメッセージがaxios.phpから送られてくる
+                        Object.assign(this.errormsg,response.data);
+                    }else{
+                        this.step = 'confirm';
+                        this.inputshow = false;
+                        this.backshow = true;
+                    }
+                    this.step = 'confirm';
+                    this.inputshow = false;
+                    this.backshow = true;
+                }).catch(error=>{
+                    exit();
+                });
+            },
+            backStep:function(){
+                this.step = 'input';
+                this.backshow = false;
+            }
+        },
+    });
+</script>
+</body>
+</html>
