@@ -38,10 +38,13 @@
 <script src="../common/js/jquery.mCustomScrollbar.js"></script>
 <script src="js/entry_form.js"></script>
 <script src="js/entry_form_input.js"></script>
+<!-- Vue.js -->
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios@0.18.0/dist/axios.min.js"></script>
+
 </head>
 <body>
-	<!-- Vue.js -->
-	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 	<div id="contentsWrap">
 		<section id="mv">
 			<h1>
@@ -217,19 +220,13 @@
 									</dt>
 									<dd>
 										<ul class="formList formList02">
-											<li v-for="q in q1master">
-												<label>
-													<!-- <input name="q1" type="radio" value="q" v-model="q">
-													<span>{{q}}</span> -->
-												</label>
-											</li>
-											<!-- <li>
+											<li>
 												<label>
 													<input name="q1" type="radio" value="1">
 													<span>店頭装飾を見つけて</span>
 												</label>
-											</li> -->
-											<!-- <li>
+											</li>
+											<li>
 												<label>
 													<input name="q1" type="radio" value="2">
 													<span>商品についている、シールを見て</span>
@@ -252,7 +249,7 @@
 													<input name="q1" type="radio" value="5">
 													<span>家族・友人からの紹介</span>
 												</label>
-											</li> -->
+											</li>
 										</ul>
 										<span class="error"></span>
 									</dd>
@@ -494,20 +491,26 @@
 			q1: '',
 			q2: [],
 			q3: '',
+			errormsg:{
+                name_sei: '',
+                name_mei: ''
+            },
 			isActive: true//入力、確認画面の切り替えフラグ
 		},
 		methods: {
 			submit: function () {
 				this.isActive = !this.isActive
 				let params = new URLSearchParams();
-                params.append('name_sei',name_sei);
-                params.append('name_mei',name_mei);
+                params.append('name_sei',this.name_sei);
+                params.append('name_mei',this.name_mei);
                 axios.post('axios.php',params)
 				.then(response =>{
                     if(response.data){
                         //エラーメッセージがaxios.phpから送られてくる
-                        Object.assign(this.errormsg,response.data);
+                        this.errormsg.name_sei = Object.assign({}, response.data);
+                        console.log(this.errormsg.name_sei);
                     }else{
+						console.log(99);
                         this.step = 'confirm';
                         this.inputshow = false;
                         this.backshow = true;
