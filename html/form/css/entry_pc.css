@@ -164,8 +164,8 @@
 		text-align: left;
 	}
 	.form .btn button {
-		background-color: #581c1c;
-		box-shadow: 0 3px #290909;
+		background-color: #FFF;
+		/* box-shadow: 0 3px #290909; */
 	}
 	.form .btn.confirm button {
 		color: #fff;
